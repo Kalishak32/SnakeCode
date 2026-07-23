@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Twoje zadanie</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🐍 Zadanie</h1>
+
+<nav>
+
+<a href="zadania.html">
+Powrót
+</a>
+
+</nav>
+
+</header>
+
+
+
+<section>
+
+
+<div class="course-card">
+
+
+<h2 id="taskName">
+Ładowanie...
+</h2>
+
+
+<p id="taskDescription">
+Ładowanie...
+</p>
+
+
+
+<div class="course-info">
+
+⚡ <span id="taskXP"></span> XP
+
+</div>
+
+
+
+<br>
+
+
+
+<h3>
+Twoje rozwiązanie:
+</h3>
+
+
+
+<textarea 
+id="codeInput"
+placeholder="Napisz tutaj swój kod..."
+style="
+width:100%;
+height:200px;
+padding:20px;
+border-radius:15px;
+background:#111;
+color:white;
+font-size:18px;
+">
+</textarea>
+
+
+
+<br><br>
+
+
+
+<button 
+class="course-btn"
+onclick="checkTask()">
+
+Sprawdź rozwiązanie
+
+</button>
+
+
+
+<h3 id="result">
+
+</h3>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+<script src="js/User.js"></script>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+
+
+<script>
+
+let currentTask = localStorage.getItem("currentTask");
+
+
+let task = tasks.find(
+    t => t.id === currentTask
+);
+
+
+
+if(task){
+
+    document.getElementById("taskName").innerHTML =
+    task.name;
+
+
+    document.getElementById("taskDescription").innerHTML =
+    task.description;
+
+
+    document.getElementById("taskXP").innerHTML =
+    task.xp;
+
+}
+
+
+
+let pyodideReady = false;
+
+let pyodide;
+
+
+
+async function startPython(){
+
+
+    document.getElementById("result").innerHTML =
+    "⏳ Ładowanie Pythona...";
+
+
+    pyodide = await loadPyodide();
+
+
+    pyodideReady = true;
+
+
+    document.getElementById("result").innerHTML =
+    "🐍 Python gotowy!";
+
+
+}
+
+
+startPython();
+async function checkTask(){
+
+
+    let code =
+    document.getElementById("codeInput").value;
+
+
+    let result =
+    document.getElementById("result");
+
+
+
+    if(code.trim() === ""){
+
+
+        result.innerHTML =
+        "❌ Najpierw wpisz kod";
+
+
+        return;
+
+    }
+
+
+
+
+    if(!pyodideReady){
+
+
+        result.innerHTML =
+        "⏳ Python jeszcze się ładuje";
+
+
+        return;
+
+    }
+
+
+
+    try{
+
+
+        let output = "";
+
+
+
+        pyodide.setStdout({
+
+
+            batched(message){
+
+
+                output += message;
+
+
+            }
+
+
+        });
+
+
+
+
+        await pyodide.runPythonAsync(code);
+
+
+
+
+
+        switch(currentTask){
+
+
+
+            case "task1":
+
+
+                if(output.trim() === "Hello World"){
+
+
+                    successTask(
+                        "Poprawnie! Hello World działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Program powinien wypisać Hello World"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task2":
+
+
+                if(output.trim().length > 0){
+
+
+                    successTask(
+                        "Imię zostało wyświetlone!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Musisz wypisać swoje imię"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task3":
+
+
+                if(output.trim().length > 0){
+
+
+                    successTask(
+                        "Zmienna działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Zmienna musi coś wypisać"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task4":
+
+
+                if(output.trim().length > 0){
+
+
+                    successTask(
+                        "Wiek został wyświetlony!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Wyświetl swój wiek"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task5":
+
+
+                if(!isNaN(output.trim())){
+
+
+                    successTask(
+                        "Dodawanie działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Wynik musi być liczbą"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task6":
+
+
+                if(!isNaN(output.trim())){
+
+
+                    successTask(
+                        "Odejmowanie działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Wynik musi być liczbą"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task7":
+
+
+                if(
+                    output.trim().length > 0
+                ){
+
+
+                    successTask(
+                        "Instrukcja IF działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "IF nic nie wypisał"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task8":
+
+
+                if(
+                    output.trim().length > 0
+                ){
+
+
+                    successTask(
+                        "Pętla FOR działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Pętla nic nie wypisała"
+                    );
+
+
+                }
+
+
+            break;
+            case "task9":
+
+
+                if(
+                    output.trim().length > 0
+                ){
+
+
+                    successTask(
+                        "Lista działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Lista nic nie wypisała"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            case "task10":
+
+
+                if(
+                    output.trim().length > 0
+                ){
+
+
+                    successTask(
+                        "Funkcja działa!"
+                    );
+
+
+                }
+
+                else{
+
+
+                    failTask(
+                        "Funkcja nic nie zwróciła"
+                    );
+
+
+                }
+
+
+            break;
+
+
+
+
+
+            default:
+
+
+                failTask(
+                    "Brak sprawdzania dla tego zadania"
+                );
+
+
+        }
+
+
+
+    }
+
+
+    catch(error){
+
+
+        result.innerHTML =
+        "❌ Błąd w kodzie:<br>" + error;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+function successTask(message){
+
+
+
+    let result =
+    document.getElementById("result");
+
+
+
+    result.innerHTML =
+    "✅ " + message + " + XP";
+
+
+
+    completeTask(currentTask);
+
+
+
+}
+
+
+
+
+function failTask(message){
+
+
+
+    let result =
+    document.getElementById("result");
+
+
+
+    result.innerHTML =
+    "❌ " + message;
+
+
+
+}
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
